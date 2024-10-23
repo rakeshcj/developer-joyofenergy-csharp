@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using JOIEnergy.Enums;
-using JOIEnergy.Services;
+﻿using JOIEnergy.Services;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,6 +24,9 @@ namespace JOIEnergy.Controllers
         [HttpGet("compare-all/{smartMeterId}")]
         public ObjectResult CalculatedCostForEachPricePlan(string smartMeterId)
         {
+            if (!ModelState.IsValid){
+                return new BadRequestObjectResult("Request Model Validation Failed");
+            }
             string pricePlanId = _accountService.GetPricePlanIdForSmartMeterId(smartMeterId);
             Dictionary<string, decimal> costPerPricePlan = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
             if (!costPerPricePlan.Any())
@@ -41,6 +42,11 @@ namespace JOIEnergy.Controllers
 
         [HttpGet("recommend/{smartMeterId}")]
         public ObjectResult RecommendCheapestPricePlans(string smartMeterId, int? limit = null) {
+
+            if (!ModelState.IsValid){
+                return new BadRequestObjectResult("Request Model Validation Failed");
+            }
+
             var consumptionForPricePlans = _pricePlanService.GetConsumptionCostOfElectricityReadingsForEachPricePlan(smartMeterId);
 
             if (!consumptionForPricePlans.Any()) {

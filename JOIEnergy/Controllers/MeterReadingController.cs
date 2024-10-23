@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JOIEnergy.Domain;
+﻿using JOIEnergy.Domain;
 using JOIEnergy.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,7 +21,10 @@ namespace JOIEnergy.Controllers
         [HttpPost ("store")]
         public ObjectResult Post([FromBody]MeterReadings meterReadings)
         {
-            if (!IsMeterReadingsValid(meterReadings)) {
+            if(!ModelState.IsValid){
+                return new BadRequestObjectResult("Request Model Validation Failed");
+            }
+            if(!IsMeterReadingsValid(meterReadings)) {
                 return new BadRequestObjectResult("Internal Server Error");
             }
             _meterReadingService.StoreReadings(meterReadings.SmartMeterId,meterReadings.ElectricityReadings);
@@ -40,6 +41,9 @@ namespace JOIEnergy.Controllers
 
         [HttpGet("read/{smartMeterId}")]
         public ObjectResult GetReading(string smartMeterId) {
+            if (!ModelState.IsValid){
+                return new BadRequestObjectResult("Request Model Validation Failed");
+            }
             return new OkObjectResult(_meterReadingService.GetReadings(smartMeterId));
         }
     }

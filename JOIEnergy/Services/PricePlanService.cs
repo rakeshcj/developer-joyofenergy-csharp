@@ -7,10 +7,8 @@ namespace JOIEnergy.Services
 {
     public class PricePlanService : IPricePlanService
     {
-        public interface Debug { void Log(string s); };
-
         private readonly List<PricePlan> _pricePlans;
-        private IMeterReadingService _meterReadingService;
+        private readonly IMeterReadingService _meterReadingService;
 
         public PricePlanService(List<PricePlan> pricePlan, IMeterReadingService meterReadingService)
         {
@@ -22,7 +20,7 @@ namespace JOIEnergy.Services
         {
             var newSummedReadings = electricityReadings.Select(readings => readings.Reading).Aggregate((reading, accumulator) => reading + accumulator);
 
-            return newSummedReadings / electricityReadings.Count();
+            return newSummedReadings / electricityReadings.Count;
         }
 
         private decimal calculateTimeElapsed(List<ElectricityReading> electricityReadings)
@@ -32,6 +30,7 @@ namespace JOIEnergy.Services
 
             return (decimal)(last - first).TotalHours;
         }
+
         private decimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
         {
             var average = calculateAverageReading(electricityReadings);
