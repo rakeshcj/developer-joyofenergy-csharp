@@ -59,7 +59,7 @@ namespace JOIEnergy
 
             PlanPriceCalculatorRegistry planPriceCalculatorRegistry = new PlanPriceCalculatorRegistry()
                 .AddPriceCalculatorToRegistry(
-                    PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculatorStrategy()
+                    PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculator()
                 );
             
 

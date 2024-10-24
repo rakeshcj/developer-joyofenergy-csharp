@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace JOIEnergy.Strategies
 {
-    public class AveragePlanPriceCalculatorStrategy : IPlanPriceCalculator
+    public class AveragePlanPriceCalculator : IPlanPriceCalculator
     {
         private decimal calculateAverageReading(List<ElectricityReading> electricityReadings)
         {

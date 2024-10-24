@@ -36,7 +36,7 @@ namespace JOIEnergy.Tests
             };
             PlanPriceCalculatorRegistry planPriceCalculatorRegistry = new PlanPriceCalculatorRegistry()
                .AddPriceCalculatorToRegistry(
-                   PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculatorStrategy()
+                   PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculator()
                );
             IPlanPriceCalculatorFactory calculatorFactory = new PlanPriceCalculatorFactory(planPriceCalculatorRegistry);
             var pricePlanService = new PricePlanService(pricePlans, _meterReadingService, calculatorFactory);
