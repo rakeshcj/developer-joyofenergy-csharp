@@ -8,6 +8,10 @@ using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Collections;
+using JOIEnergy.Compositions;
+using JOIEnergy.Factories;
+using JOIEnergy.Registers;
+using JOIEnergy.Strategies;
 
 namespace JOIEnergy.Tests
 {
@@ -30,7 +34,12 @@ namespace JOIEnergy.Tests
                 new PricePlan() { PlanName = PRICE_PLAN_2_ID, UnitRate = 1, PeakTimeMultiplier = NoMultipliers() },
                 new PricePlan() { PlanName = PRICE_PLAN_3_ID, UnitRate = 2, PeakTimeMultiplier = NoMultipliers() } 
             };
-            var pricePlanService = new PricePlanService(pricePlans, _meterReadingService);
+            PlanPriceCalculatorRegistry planPriceCalculatorRegistry = new PlanPriceCalculatorRegistry()
+               .AddPriceCalculatorToRegistry(
+                   PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculatorStrategy()
+               );
+            IPlanPriceCalculatorFactory calculatorFactory = new PlanPriceCalculatorFactory(planPriceCalculatorRegistry);
+            var pricePlanService = new PricePlanService(pricePlans, _meterReadingService, calculatorFactory);
             var smartMeterToPricePlanAccounts = new Dictionary<string, string>
             {
                 { SMART_METER_ID, PRICE_PLAN_1_ID }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JOIEnergy.Compositions;
 using JOIEnergy.Domain;
 
 namespace JOIEnergy.Services
@@ -9,34 +10,13 @@ namespace JOIEnergy.Services
     {
         private readonly List<PricePlan> _pricePlans;
         private readonly IMeterReadingService _meterReadingService;
+        private readonly IPlanPriceCalculatorFactory _planPriceCalculatorFactory;
 
-        public PricePlanService(List<PricePlan> pricePlan, IMeterReadingService meterReadingService)
+        public PricePlanService(List<PricePlan> pricePlan, IMeterReadingService meterReadingService, IPlanPriceCalculatorFactory planPriceCalculatorFactory)
         {
             _pricePlans = pricePlan;
             _meterReadingService = meterReadingService;
-        }
-
-        private decimal calculateAverageReading(List<ElectricityReading> electricityReadings)
-        {
-            var newSummedReadings = electricityReadings.Select(readings => readings.Reading).Aggregate((reading, accumulator) => reading + accumulator);
-
-            return newSummedReadings / electricityReadings.Count;
-        }
-
-        private decimal calculateTimeElapsed(List<ElectricityReading> electricityReadings)
-        {
-            var first = electricityReadings.Min(reading => reading.Time);
-            var last = electricityReadings.Max(reading => reading.Time);
-
-            return (decimal)(last - first).TotalHours;
-        }
-
-        private decimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
-        {
-            var average = calculateAverageReading(electricityReadings);
-            var timeElapsed = calculateTimeElapsed(electricityReadings);
-            var averagedCost = average/timeElapsed;
-            return Math.Round(averagedCost * pricePlan.UnitRate, 3);
+            _planPriceCalculatorFactory = planPriceCalculatorFactory;
         }
 
         public Dictionary<string, decimal> GetConsumptionCostOfElectricityReadingsForEachPricePlan(string smartMeterId)
@@ -47,7 +27,12 @@ namespace JOIEnergy.Services
             {
                 return new Dictionary<string, decimal>();
             }
-            return _pricePlans.ToDictionary(plan => plan.PlanName, plan => calculateCost(electricityReadings, plan));
+            return _pricePlans.ToDictionary(
+                plan => plan.PlanName, 
+                plan => _planPriceCalculatorFactory
+                            .GetPlanPriceCalculatorFor(Enums.PlanPriceCalculatorType.AverageUnits)
+                            .CalculateCost(electricityReadings, plan)
+            );
         }
     }
 }

@@ -9,6 +9,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using JOIEnergy.Compositions;
+using JOIEnergy.Registers;
+using JOIEnergy.Enums;
+using JOIEnergy.Strategies;
+using JOIEnergy.Factories;
 
 namespace JOIEnergy
 {
@@ -52,9 +57,16 @@ namespace JOIEnergy
                 }
             };
 
+            PlanPriceCalculatorRegistry planPriceCalculatorRegistry = new PlanPriceCalculatorRegistry()
+                .AddPriceCalculatorToRegistry(
+                    PlanPriceCalculatorType.AverageUnits, new AveragePlanPriceCalculatorStrategy()
+                );
+            
+
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();
+            services.AddSingleton<IPlanPriceCalculatorFactory>(provider => new PlanPriceCalculatorFactory(planPriceCalculatorRegistry));
             services.AddTransient<IPricePlanService, PricePlanService>();
             services.AddSingleton((IServiceProvider arg) => readings);
             services.AddSingleton((IServiceProvider arg) => pricePlans);

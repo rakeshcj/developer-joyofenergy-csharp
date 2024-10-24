@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JOIEnergy.Services
+namespace JOIEnergy.Compositions
 {
     public interface IPricePlanService
     {
